@@ -1,2 +1,2 @@
 # CVMS-backend
-Backend repository , for "community volunteering management system"  . Teck stack is Nodejs Express,typesctript , mongodb
+Backend repository , for "community volunteering management system"  . Tech stack is Nodejs Express,typesctript , mongodb
