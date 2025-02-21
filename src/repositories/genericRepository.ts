@@ -18,8 +18,9 @@ interface IGenericRepository<T extends Document>{
    return this.model.find(query)
     }
     async create(data: Partial<T>):Promise<T>{
-      const document = new this.model(data);
-      return document.save()
+      const document =  this.model.create({...data});
+      const leanObject =(await document).toObject()
+      return leanObject as T
     }
 
     async findAll(): Promise<T[]> {

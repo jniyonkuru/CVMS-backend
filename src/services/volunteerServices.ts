@@ -21,6 +21,12 @@ async createVolunteer(volunteerData:IVolunteer):Promise<IVolunteer>{
         .join(", ");
       throw new Error(`Validation failed: ${errorMessage}`);
       }
+      const {email}=volunteerData;
+       const userExists= await this.repository.find({email:email});
+
+       if(userExists.length>1){
+              throw new Error(`Email already registered`);
+       }
     const volunteer= await this.repository.create(volunteerData);
     return volunteer;
     

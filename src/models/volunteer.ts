@@ -9,7 +9,7 @@ const volunteerAvailabilityStatus={
   weekdays:'weekdays',
   weekends:'weekends',
   flexible:'flexible'
-}
+}  as const;
  const status={
     active:'active',
     inactive:'inactive'
@@ -20,7 +20,6 @@ const volunteerAvailabilityStatus={
  export type  StatusType=typeof status[keyof typeof status];
 
  export interface IVolunteer extends Document{
-volunteerId?:mongoose.Types.ObjectId,
 firstName:string,
 lastName:string,
 email:string,
@@ -44,11 +43,12 @@ status?:StatusType,
     country:{
         type:String,
         required:true,
-    }
+    },
+
 })
 
 const VolunteerSchema = new Schema<IVolunteer>({
-    volunteerId:Schema.Types.ObjectId,
+   
     firstName:{
         type:String,
         required:true,
@@ -83,9 +83,14 @@ const VolunteerSchema = new Schema<IVolunteer>({
     },
     availability:{
         type:String,
-        required:true
+        enum:Object.keys(volunteerAvailabilityStatus),
+        default:'flexible'
+
     },
-    location:LocationSchema,
+    location:{
+        type:LocationSchema,
+        _id:false
+    },
     profilePicture: { type: String, 
     required: false 
     },
@@ -95,7 +100,8 @@ const VolunteerSchema = new Schema<IVolunteer>({
     status: { 
         type: String,
          enum: ["active", "inactive"],
-          default: "active" }
+          default: "active",
+        }
 })
  
  export const Volunteer= mongoose.model<IVolunteer>('Volunteer',VolunteerSchema);

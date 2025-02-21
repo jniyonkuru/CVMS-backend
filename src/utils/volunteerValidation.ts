@@ -6,8 +6,8 @@ const statusType = z.enum(["active", "inactive"]);
 
 const locationSchema = z.object({
   city: z.string(),
-  state: z.string(),
-  zipCode: z.string().optional(),
+  country: z.string(),
+
 });
 
 
