@@ -2,7 +2,7 @@ import mongoose ,{Document,Schema } from 'mongoose';
 import { StatusType ,ILocation,LocationSchema} from './volunteer';
 
 export interface IOrganization extends Document{
-organizationId:mongoose.Types.ObjectId,
+organizationId?:mongoose.Types.ObjectId,
 name:string,
 email:string,
 phoneNumber:string,

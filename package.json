@@ -1,10 +1,13 @@
 {
   "name": "cvms-backend",
   "version": "1.0.0",
-  "description": "Backend repository , for \"community volunteering management system\"  . Tech stack is Nodejs Express,typesctript , mongodb",
+  "description": "Backend repository , for \"community volunteering management system\"  . Tech stack is Nodejs Express,typescript , mongodb",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/server.ts",
+    "lint": "eslint . --ext .ts"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +18,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.10.0"
+    "mongoose": "^8.10.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

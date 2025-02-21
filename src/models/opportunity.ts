@@ -43,6 +43,12 @@ const OpportunitySchema = new Schema<IOpportunity>({
     startDate: {
         type: Date,
         required: true,
+        validate:{
+            validator:function(this:IOpportunity,value:Date){
+                return this.endDate?value<this.endDate:true;
+            },
+            message:"Start date should be before En date"
+        }
     },
     endDate: {
         type: Date,
@@ -55,6 +61,7 @@ const OpportunitySchema = new Schema<IOpportunity>({
     numberOfVolunteerNeeded: {
         type: Number,
         required: true,
+        min:[1,"At least one volunteer is needed"]
     },
     status: {
         type: String,

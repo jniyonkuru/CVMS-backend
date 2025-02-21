@@ -20,7 +20,7 @@ const volunteerAvailabilityStatus={
  export type  StatusType=typeof status[keyof typeof status];
 
  export interface IVolunteer extends Document{
-volunteerId:mongoose.Types.ObjectId,
+volunteerId?:mongoose.Types.ObjectId,
 firstName:string,
 lastName:string,
 email:string,
@@ -32,7 +32,7 @@ availability:volunteerAvailabilityType,
 location:ILocation,
 profilePicture?:string,
 dateJoined:Date,
-status:StatusType,
+status?:StatusType,
 }
 
 
