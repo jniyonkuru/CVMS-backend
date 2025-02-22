@@ -43,7 +43,6 @@ const volunteer= this.repository.findById(id);
      throw new Error("User with the given id  was not found");
   }
 
-
    return  volunteer;
 }
 
@@ -78,13 +77,10 @@ async deleteVolunteer (id:string){
       }
     return await this.repository.delete(id)
 }
-
 async findAllVolunteer(query:Record<string,any>):Promise<IVolunteer[]>{
 
     return  await this.repository.find(query)
-
 }
-
 }
 
  export default VolunteerServices;

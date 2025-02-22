@@ -2,7 +2,6 @@ import mongoose ,{Document,Schema } from 'mongoose';
 import { StatusType ,ILocation,LocationSchema} from './volunteer';
 
 export interface IOrganization extends Document{
-organizationId?:mongoose.Types.ObjectId,
 name:string,
 email:string,
 phoneNumber:string,
@@ -18,7 +17,6 @@ missionStatement:string,
 }
 
 const OrganizationSchema = new Schema<IOrganization>({
-organizationId:Schema.Types.ObjectId,
   name:{
         type:String,
         required:true,
@@ -42,7 +40,11 @@ organizationId:Schema.Types.ObjectId,
         required:true,
         default:undefined,
     },
-    location:LocationSchema,
+    location:{
+        type:LocationSchema,
+        required:true,
+        _id:false
+    },
     profilePicture: { type: String, 
     required: false 
     },
@@ -54,6 +56,6 @@ organizationId:Schema.Types.ObjectId,
          enum: ["active", "inactive"],
           default: "active" 
         }
-})
+},{timestamps:true})
  
  export const Organization= mongoose.model<IOrganization>('Organization',OrganizationSchema);

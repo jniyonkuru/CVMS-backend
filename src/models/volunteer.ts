@@ -102,7 +102,7 @@ const VolunteerSchema = new Schema<IVolunteer>({
          enum: ["active", "inactive"],
           default: "active",
         }
-})
+},{timestamps:true})
  
  export const Volunteer= mongoose.model<IVolunteer>('Volunteer',VolunteerSchema);
 

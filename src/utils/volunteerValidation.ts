@@ -4,7 +4,7 @@ const volunteerAvailabilityType = z.enum(["weekdays", "weekends", "flexible"]);
 const statusType = z.enum(["active", "inactive"]);
 
 
-const locationSchema = z.object({
+ export const locationSchema = z.object({
   city: z.string(),
   country: z.string(),
 
@@ -38,7 +38,6 @@ const volunteerValidationSchema = z.object({
   availability: volunteerAvailabilityType.optional(), 
   location: locationSchema.optional(), 
   profilePicture: z.string().optional().optional(), 
-  dateJoined: z.date().optional().optional(), 
   status: statusType.optional().optional(),
 }).strict();
 
