@@ -12,7 +12,7 @@ profilePicture?:string,
 status:StatusType,
 websiteUrl:string,
 logo?:string,
-dateRegistered:Date,
+dateRegistered?:Date,
 missionStatement:string,
 }
 
@@ -48,6 +48,9 @@ const OrganizationSchema = new Schema<IOrganization>({
     profilePicture: { type: String, 
     required: false 
     },
+    logo: { type: String, 
+        required: false 
+        },
     dateRegistered: { 
         type: Date, 
         default: Date.now },
@@ -55,7 +58,11 @@ const OrganizationSchema = new Schema<IOrganization>({
         type: String,
          enum: ["active", "inactive"],
           default: "active" 
-        }
+        },
+        missionStatement:{
+            type:String,
+            required:true
+        },
 },{timestamps:true})
  
  export const Organization= mongoose.model<IOrganization>('Organization',OrganizationSchema);

@@ -10,10 +10,10 @@ const OrganizationValidationSchema = z.object({
     focusArea: z.array(z.string()).nonempty({ message: 'At least one focus area is required' }),
     location: locationSchema,
     profilePicture: z.string().optional(),
-    status: StatusTypeSchema,
+    status: StatusTypeSchema.optional(),
     websiteUrl: z.string().url({ message: 'Invalid website URL' }),
     logo: z.string().optional(),
-    dateRegistered: z.date(),
+    dateRegistered: z.date().optional(),
     missionStatement: z.string().min(1, { message: 'Mission statement is required' }),
 }).strict();
 

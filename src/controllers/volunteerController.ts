@@ -117,7 +117,7 @@ static async updateVolunteer(req:Request, res:Response,next:NextFunction):Promis
       data:volunteersWithoutPasswords
      })
    } catch (error) {
-    
+     next(error);
    }
 
  }

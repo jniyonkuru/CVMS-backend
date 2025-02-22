@@ -77,7 +77,7 @@ async deleteOrganization (id:string){
       }
     return await this.repository.delete(id)
 }
-async findAllVolunteer(query:Record<string,any>):Promise<IOrganization[]>{
+async findAllOrganization(query:Record<string,any>):Promise<IOrganization[]>{
 
     return  await this.repository.find(query)
 }
