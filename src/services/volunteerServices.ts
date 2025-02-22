@@ -1,14 +1,17 @@
 import { IVolunteer } from "../models/volunteer";
 import { VolunteerRepository } from "../repositories/volunteerRepository";
-import volunteerValidationSchema from "../utils/volunteerValidation";
-
+import volunteerValidationSchema,{volunteerUpdateSchema}from "../utils/volunteerValidation";
+import { Bcrypt } from "../utils/bcryptUtils";
 
 class VolunteerServices{
 
 private repository:VolunteerRepository;
 private validator=volunteerValidationSchema;
+private updateValitor=volunteerUpdateSchema;
+private bcrypt:Bcrypt;
  constructor( repository:VolunteerRepository){
  this.repository=repository;
+ this.bcrypt=new Bcrypt();
 
 }
 
@@ -21,13 +24,14 @@ async createVolunteer(volunteerData:IVolunteer):Promise<IVolunteer>{
         .join(", ");
       throw new Error(`Validation failed: ${errorMessage}`);
       }
-      const {email}=volunteerData;
+      const {email,password}=volunteerData;
        const userExists= await this.repository.find({email:email});
 
        if(userExists.length>1){
               throw new Error(`Email already registered`);
        }
-    const volunteer= await this.repository.create(volunteerData);
+       const hashedPassword= await  this.bcrypt.hashPassword(password);
+       const volunteer= await this.repository.create({...volunteerData,password:hashedPassword});
     return volunteer;
     
 }
@@ -35,7 +39,6 @@ async createVolunteer(volunteerData:IVolunteer):Promise<IVolunteer>{
 async findVolunteer(id:string){
 
 const volunteer= this.repository.findById(id);
-
   if(!volunteer){
      throw new Error("User with the given id  was not found");
   }
@@ -47,11 +50,15 @@ const volunteer= this.repository.findById(id);
 async updateVolunteer(updatedData:IVolunteer,id:string):Promise<IVolunteer | null>{
 
      const volunteer = this.repository.findById(id);
-
       if(! volunteer){
          throw new Error("User with the given id was not found");
       }
-    const validationResult= this.validator.safeParse(updatedData);
+      const {email}=updatedData;
+
+      if(email){
+         throw new Error("Email can not be updated");
+      }
+    const validationResult= this.updateValitor.safeParse(updatedData);
     if(!validationResult.success){
         const errorMessage = validationResult.error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
@@ -78,9 +85,6 @@ async findAllVolunteer(query:Record<string,any>):Promise<IVolunteer[]>{
 
 }
 
-
-
 }
-
 
  export default VolunteerServices;

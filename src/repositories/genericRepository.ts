@@ -15,7 +15,8 @@ interface IGenericRepository<T extends Document>{
       this.model=model;
     }
     async find(query:Record<string,any>):Promise<T[]>{
-   return this.model.find(query)
+      const docs= await this.model.find(query).lean();
+   return docs as T[];
     }
     async create(data: Partial<T>):Promise<T>{
       const document =  this.model.create({...data});
@@ -24,17 +25,21 @@ interface IGenericRepository<T extends Document>{
     }
 
     async findAll(): Promise<T[]> {
-       return this.model.find();
+      const docs= await  this.model.find().lean();
+       return docs as T[];
     }
 
    async update(id: string, data: Partial<T>): Promise<T|null> {
-      return this.model.findByIdAndUpdate(id,data,{new:true})
+      
+      const doc=await this.model.findByIdAndUpdate(id,data,{new:true}).lean()
+      return doc as T;
    }
     async delete(id: string): Promise<void> {
-        this.model.findByIdAndDelete(id);
+       await  this.model.findByIdAndDelete(id);
     }
-    findById(id: string): Promise<T | null> {
-       return this.model.findById(id);
+   async findById(id: string): Promise<T | null> {
+      const doc=  await this.model.findById(id).lean();
+       return doc  as T;
     }
 
 
