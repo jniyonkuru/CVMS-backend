@@ -5,9 +5,8 @@ const statusType = z.enum(["active", "inactive"]);
 
 
  export const locationSchema = z.object({
-  city: z.string(),
-  country: z.string(),
-
+  city: z.string().min(1,{message:"City is required"}),
+  country: z.string().min(1,{message:"message is required"}),
 });
 
 

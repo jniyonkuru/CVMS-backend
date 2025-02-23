@@ -46,7 +46,7 @@ const volunteer= this.repository.findById(id);
    return  volunteer;
 }
 
-async updateVolunteer(updatedData:IVolunteer,id:string):Promise<IVolunteer | null>{
+async updateVolunteer(updatedData:Partial<IVolunteer>,id:string):Promise<IVolunteer | null>{
 
      const volunteer = this.repository.findById(id);
       if(! volunteer){
