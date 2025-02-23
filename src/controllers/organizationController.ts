@@ -45,18 +45,18 @@ static async updateOrganization(req:Request, res:Response,next:NextFunction):Pro
 
   if(!id){
     res.status(400)
-    throw new Error('Id of a user is  required ');
+    throw new Error('Id  is  required ');
   }
      
    const organization:IOrganization| null= await service.updateOrganization(req.body,id);
 
    if(!organization){
-     throw new Error('Failed to update the user');
+     throw new Error('Failed to update the organization');
    }
   res.status(201).json({
     status:"success",
-    message:"The user was successfully  updated",
-    data:omit(organization,['_v','password'])
+    message:"The organization was successfully  updated",
+    data:omit(organization,['__v','password'])
   })
      } catch (error) {
         next(error)
@@ -72,12 +72,12 @@ static async updateOrganization(req:Request, res:Response,next:NextFunction):Pro
     const {id}= req.params;
     if(!id){
       res.status(400)
-      throw new Error('Id of a user is  required ');
+      throw new Error('Id is  required ');
     }
      await service.deleteOrganization(id);
      res.status(200).json({
        status:'success',
-       message:"user successfully deleted",
+       message:"organization successfully deleted",
      })
   } catch (error) {
      next(error)
@@ -92,7 +92,7 @@ static async updateOrganization(req:Request, res:Response,next:NextFunction):Pro
     const {id}= req.params;
     if(!id){
     res.status(400);
-    throw new Error("User Id is required");
+    throw new Error(" Id is required");
     }
     const organization= await service.findOrganization(id);
     const organizationWithoutpassword=omit(organization,['__v','password'])
