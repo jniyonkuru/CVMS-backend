@@ -11,7 +11,7 @@ const OpportunityStatusTypeSchema = z.enum(['open', 'closed', 'ongoing'], {
     organizationId: z.string().refine((value) => mongoose.Types.ObjectId.isValid(value), {
         message: 'Invalid organization ID',
     }),
-    Title: z.string().min(1, { message: 'Title is required' }),
+    title: z.string().min(1, { message: 'Title is required' }),
     skillsRequired: z.array(z.string().min(1, { message: 'Skill cannot be empty' })).nonempty({
         message: 'At least one skill is required',
     }),
@@ -22,6 +22,22 @@ const OpportunityStatusTypeSchema = z.enum(['open', 'closed', 'ongoing'], {
     numberOfVolunteerNeeded: z.number().int().positive({
         message: 'Number of volunteers needed must be a positive integer',
     }),
-    status: OpportunityStatusTypeSchema,
+    status: OpportunityStatusTypeSchema.optional(),
+}).strict();
+
+export  const UpdateOpportunityValidationSchema=z.object({
+
+    title: z.string().min(1, { message: 'Title is required' }),
+    skillsRequired: z.array(z.string().min(1, { message: 'Skill cannot be empty' })).nonempty({
+        message: 'At least one skill is required',
+    }),
+    location: locationSchema,
+    startDate: z.date(),
+    endDate: z.date(),
+    duration: z.string().min(1, { message: 'Duration is required' }),
+    numberOfVolunteerNeeded: z.number().int().positive({
+        message: 'Number of volunteers needed must be a positive integer',
+    }),
+    status: OpportunityStatusTypeSchema.optional(),
 }).strict();
 

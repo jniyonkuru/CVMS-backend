@@ -1,8 +1,8 @@
 import { NextFunction, Request,Response } from "express";
 import { Jwt } from "../utils/jwtUtils";
 
-interface CustomRequest extends Request{
-  user:Record<string,any>
+ export interface CustomRequest extends Request{
+  user?:Record<string,any>
 }
 
  export  class Middleware{

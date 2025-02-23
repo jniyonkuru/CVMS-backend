@@ -10,7 +10,7 @@ export type OpportunityStatusType = typeof opportunityStatus[keyof typeof opport
 
 export interface IOpportunity extends Document {
     organizationId: mongoose.Types.ObjectId;
-    Title: string;
+    title: string;
     skillsRequired: string[];
     location: ILocation;
     startDate: Date;
@@ -26,7 +26,7 @@ const OpportunitySchema = new Schema<IOpportunity>({
         ref: "Organization",
         required: true,
     },
-    Title: {
+    title: {
         type: String,
         required: true,
     },
@@ -37,6 +37,7 @@ const OpportunitySchema = new Schema<IOpportunity>({
     location: {
         type: LocationSchema,
         required: true,
+        _id:false
     },
     startDate: {
         type: Date,
