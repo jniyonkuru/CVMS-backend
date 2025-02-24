@@ -4,8 +4,7 @@ import OpportunityServices from "../services/opportunityServices";
 import { IOpportunity } from "../models/opportunity";
 import { CustomRequest } from "../middlewares/Middlewares";
 import {omit, isEmpty}from "lodash"
-import { Jwt } from "../utils/jwtUtils";
-import { Bcrypt } from "../utils/bcryptUtils";
+
 
 export class OpportunityController {
 
@@ -102,9 +101,6 @@ static async updateOpportunity(req:CustomRequest, res:Response,next:NextFunction
        res.status(400)
        throw new Error("Opportunity with given id for this organization was not found");
     }
-
-
-
 
      await service.deleteOpportunity(id);
      res.status(203).json({

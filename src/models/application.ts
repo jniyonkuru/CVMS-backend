@@ -9,8 +9,7 @@ const applicationStatus={
 
  export type ApplicationStatusTypes= typeof applicationStatus[keyof typeof applicationStatus]
 
- export interface IApplication{
-   applicationId?:Types.ObjectId,
+ export interface IApplication extends Document{
    opportunityId:Types.ObjectId,
    volunteerId:Types.ObjectId,
    applicationDate:Date,
@@ -19,7 +18,7 @@ const applicationStatus={
 
 
 const applicationSchema= new Schema<IApplication>({
-    applicationId:Schema.Types.ObjectId,
+
     opportunityId:{
         type:Schema.Types.ObjectId,
         required:true,
@@ -54,5 +53,7 @@ const applicationSchema= new Schema<IApplication>({
 })
 
 const Application= mongoose.model<IApplication>('Application',applicationSchema);
+
+export default Application;
 
 
