@@ -5,6 +5,7 @@ import { IVolunteer } from "../models/volunteer";
 import {omit, isEmpty, pick}from "lodash"
 import { Jwt } from "../utils/jwtUtils";
 import { Bcrypt } from "../utils/bcryptUtils";
+import volunteerValidationSchema from "../utils/volunteerValidation";
 
   export class VolunteerController {
 
@@ -65,6 +66,22 @@ if(!token){
         res.status(400);
         throw new Error('request body can not be empty')
       } 
+      const validationResult=volunteerValidationSchema.safeParse(req.body);
+
+      if(!validationResult.success){
+        const errorMessage = validationResult.error.errors
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
+        .join(", ");
+        res.status(400)
+      throw new Error(`Validation failed: ${errorMessage}`);
+      }  
+      const{email}=req.body       
+
+        let exists= await service.findAllVolunteer({email});
+        if(exists){
+          res.status(400);
+          throw new Error("User with the given email already exists")
+        }
        let  volunteer: Partial<IVolunteer>|null=  await service.createVolunteer(req.body);
 
        if(!volunteer){

@@ -16,20 +16,11 @@ private bcrypt:Bcrypt;
 }
 
 async createVolunteer(volunteerData:IVolunteer):Promise<IVolunteer>{
-      const validationResult=this.validator.safeParse(volunteerData);
+     
+      const {password}=volunteerData;
 
-      if(!validationResult.success){
-        const errorMessage = validationResult.error.errors
-        .map((err) => `${err.path.join(".")}: ${err.message}`)
-        .join(", ");
-      throw new Error(`Validation failed: ${errorMessage}`);
-      }
-      const {email,password}=volunteerData;
-       const userExists= await this.repository.find({email:email});
 
-       if(userExists.length>1){
-              throw new Error(`Email already registered`);
-       }
+
        const hashedPassword= await  this.bcrypt.hashPassword(password);
        const volunteer= await this.repository.create({...volunteerData,password:hashedPassword});
     return volunteer;

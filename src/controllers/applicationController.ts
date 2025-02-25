@@ -60,10 +60,25 @@ static async updateApplication(req:CustomRequest, res:Response,next:NextFunction
  
  const applications= await service.findApplications({volunteerId:user._id,_id:id});
 
+
  if(applications.length===0){
     res.status(400)
     throw new Error("application with given id for this organization was not found");
  }
+ const populatedApplications:Record<string,any>[] = await Promise.all(
+    applications.map(async (application) => {
+      return application.populate(["volunteerId", "opportunityId"]);
+    })
+  );
+  const application = populatedApplications[0]; 
+  const organizationId = application.opportunityId.organizationId; 
+
+  if (organizationId.toString() !== user._id.toString()) {
+    res.status(403).json({ message: "Unauthorized" });
+    return;
+  }
+
+
    const updateApplication:IApplication| null= await service.updateApplication(req.body,id);
    if(!updateApplication){
      throw new Error('Failed to update the application');

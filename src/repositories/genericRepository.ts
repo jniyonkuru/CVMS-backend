@@ -15,7 +15,7 @@ interface IGenericRepository<T extends Document>{
       this.model=model;
     }
     async find(query:Record<string,any>):Promise<T[]>{
-      const docs= await this.model.find(query).lean();
+      const docs= await this.model.find(query);
    return docs as T[];
     }
     async create(data: Partial<T>):Promise<T>{
