@@ -7,6 +7,8 @@ import OrganizationServices from "../services/organizationService";
 import { Bcrypt } from "../utils/bcryptUtils";
 import { Jwt } from "../utils/jwtUtils";
 import { pick } from "lodash";
+import { CustomRequest } from "../middlewares/Middlewares";
+import OrganizationValidationSchema,{OrganizationUpdateValidationSchema} from "../utils/organizationValidation";
 
   export class OrganizationController {
 
@@ -38,7 +40,7 @@ import { pick } from "lodash";
       res.status(400)
       throw new Error("Invalid credentials");
     }
-const payload= pick(organization,['_id','email']);
+const payload= pick(organization,['_id','email','role']);
 const token =jwtInstance.generateToken(payload);
 if(!token){
   throw new Error("Internal Error")
@@ -60,13 +62,29 @@ if(!token){
   static async createOrganization(req:Request,res:Response,next:NextFunction):Promise<void>{
     const  repository= new OrganizationRepository();
     const service= new OrganizationServices( repository);
+    const bcryptInstance= new Bcrypt();
      try {
       const emptyBody=isEmpty(req.body);
       if(emptyBody){
         res.status(400);
         throw new Error('request body can not be empty')
       } 
-       let  organization: Partial<IOrganization>|null=  await service.createOrganization(req.body);
+      const validationResult=OrganizationValidationSchema.safeParse(req.body);
+
+      if(!validationResult.success){
+        const errorMessage = validationResult.error.errors
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
+        .join(", ");
+      throw new Error(`Validation failed: ${errorMessage}`);
+      }
+      const {email,password,name}=req.body;
+       const organizationExists= await service.findAllOrganization({$or:[{email},{name}]});
+
+       if(organizationExists.length>0){
+              throw new Error(`Organization already registered`);
+       }
+       const hashedPassword= await  bcryptInstance.hashPassword(password);
+       const organization= await service.createOrganization({...req.body,password:hashedPassword});
 
        if(!organization){
          throw new Error('Failed to register  a organization')
@@ -86,16 +104,27 @@ if(!token){
 
 }
 
-static async updateOrganization(req:Request, res:Response,next:NextFunction):Promise<void>{
+static async updateOrganization(req:CustomRequest, res:Response,next:NextFunction):Promise<void>{
 
   const repository= new OrganizationRepository();
   const service= new OrganizationServices( repository);
   try{
   const {id}= req.params;
+  const user= req.user;
 
   if(!id){
     res.status(400)
     throw new Error('Id  is  required ');
+  }
+  const orgExists = await service.findOrganization(id);
+
+if(!orgExists){
+  res.status(400);
+  throw new Error("Organization with the given id does not exists")
+}
+  if(user && user._id !== id){
+    res.status(401);
+    throw new Error("unauthorized")
   }
      
    const organization:IOrganization| null= await service.updateOrganization(req.body,id);
@@ -114,16 +143,29 @@ static async updateOrganization(req:Request, res:Response,next:NextFunction):Pro
 
 }
 
- static  async deleteOrganization(req:Request, res:Response,next:NextFunction):Promise<void>{
+ static  async deleteOrganization(req:CustomRequest, res:Response,next:NextFunction):Promise<void>{
   const repository= new OrganizationRepository();
   const  service= new OrganizationServices( repository);
 
   try {
     const {id}= req.params;
+    const user= req.user;
     if(!id){
       res.status(400)
       throw new Error('Id is  required ');
     }
+ const orgExists= await service.findOrganization(id);
+
+ if(!orgExists){
+res.status(400);
+throw new Error('Organization with the given id does not exists')
+
+ }
+ if(user&& user._id!== id){
+  res.status(403);
+  throw new Error("unauthorized")
+ }
+
      await service.deleteOrganization(id);
      res.status(200).json({
        status:'success',
@@ -145,6 +187,11 @@ static async updateOrganization(req:Request, res:Response,next:NextFunction):Pro
     throw new Error(" Id is required");
     }
     const organization= await service.findOrganization(id);
+
+    if(!organization){
+      res.status(400);
+      throw new Error("Organization with  the given id  does not exists")
+    }
     const organizationWithoutpassword=omit(organization,['__v','password'])
     res.status(203).json({
       status:'success',

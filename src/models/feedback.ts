@@ -1,8 +1,6 @@
-import mongoose,{Types,Schema} from "mongoose";
+import mongoose,{Types,Schema,Document} from "mongoose";
 
-
-interface IFeedback{
- feedbackId:Types.ObjectId,
+ export interface IFeedback extends Document{
  volunteerId:Types.ObjectId,
  organizationId:Types.ObjectId,
  comments:string,
@@ -11,8 +9,8 @@ interface IFeedback{
      
 }
 
-const feedbackSchema= new Schema({
- feedbackId:Schema.Types.ObjectId,
+const feedbackSchema= new Schema<IFeedback>({
+
  volunteerId:{
     type:Schema.Types.ObjectId,
     ref:'Volunteer',
@@ -33,6 +31,11 @@ const feedbackSchema= new Schema({
     type: Date,
     default: Date.now,
   },
+  comments:{
+   type:String,
+   required:true,
+  }
+
 
 })
 

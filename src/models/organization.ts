@@ -14,6 +14,7 @@ websiteUrl:string,
 logo?:string,
 dateRegistered?:Date,
 missionStatement:string,
+role?:string
 }
 
 const OrganizationSchema = new Schema<IOrganization>({
@@ -63,6 +64,10 @@ const OrganizationSchema = new Schema<IOrganization>({
             type:String,
             required:true
         },
+        role:{
+            type:String,
+            default:"organization"
+        }
 },{timestamps:true})
  
  export const Organization= mongoose.model<IOrganization>('Organization',OrganizationSchema);

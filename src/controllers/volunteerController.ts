@@ -6,6 +6,7 @@ import {omit, isEmpty, pick}from "lodash"
 import { Jwt } from "../utils/jwtUtils";
 import { Bcrypt } from "../utils/bcryptUtils";
 import volunteerValidationSchema from "../utils/volunteerValidation";
+import { CustomRequest } from "../middlewares/Middlewares";
 
   export class VolunteerController {
 
@@ -38,7 +39,7 @@ import volunteerValidationSchema from "../utils/volunteerValidation";
       res.status(400)
       throw new Error("Invalid credentials");
     }
-const payload= pick(volunteer,['_id','email']);
+const payload= pick(volunteer,['_id','email',"role"]);
 const token =jwtInstance.generateToken(payload);
 if(!token){
   throw new Error("Internal Error")
@@ -78,7 +79,7 @@ if(!token){
       const{email}=req.body       
 
         let exists= await service.findAllVolunteer({email});
-        if(exists){
+        if(exists.length>0){
           res.status(400);
           throw new Error("User with the given email already exists")
         }
@@ -102,7 +103,7 @@ if(!token){
 
 }
 
-static async updateVolunteer(req:Request, res:Response,next:NextFunction):Promise<void>{
+static async updateVolunteer(req:CustomRequest, res:Response,next:NextFunction):Promise<void>{
 
   const repository= new VolunteerRepository();
   const service= new VolunteerServices( repository);
@@ -113,7 +114,21 @@ static async updateVolunteer(req:Request, res:Response,next:NextFunction):Promis
     res.status(400)
     throw new Error('Id of a user is  required ');
   }
-     
+  const user= req.user;
+
+  let userExits= await service.findVolunteer(id);
+
+  if(!userExits){
+    res.status(400);
+    throw new Error("User with the given Id does not exists")
+  }
+  
+  if(user && user._id!==id){
+      res.status(401);
+      throw new Error("unauthorized")
+    }
+ 
+
    const volunteer:IVolunteer| null= await service.updateVolunteer(req.body,id);
 
    if(!volunteer){
@@ -140,6 +155,17 @@ static async updateVolunteer(req:Request, res:Response,next:NextFunction):Promis
       res.status(400)
       throw new Error('Id of a user is  required ');
     }
+const volunteer:IVolunteer|null= await service.findVolunteer(id)
+if(!volunteer){
+  res.status(400)
+  throw new Error('User with the given id does not exists')
+}
+
+if(id && id!== volunteer._id){
+  res.status(401)
+  throw new Error("unauthorized")
+}
+
      await service.deleteVolunteer(id);
      res.status(200).json({
        status:'success',

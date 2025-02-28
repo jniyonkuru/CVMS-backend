@@ -10,7 +10,7 @@ const OpportunityStatusTypeSchema = z.enum(['open', 'closed', 'ongoing'], {
  export const OpportunityValidationSchema = z.object({
     organizationId: z.string().refine((value) => mongoose.Types.ObjectId.isValid(value), {
         message: 'Invalid organization ID',
-    }),
+    }).optional(),
     title: z.string().min(1, { message: 'Title is required' }),
     skillsRequired: z.array(z.string().min(1, { message: 'Skill cannot be empty' })).nonempty({
         message: 'At least one skill is required',

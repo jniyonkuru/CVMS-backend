@@ -22,12 +22,12 @@ import { Jwt } from "../utils/jwtUtils";
 
 }
 
- static authentication(req:CustomRequest,res:Response,next:NextFunction):void{
+ static authentication(role?:"volunteer"|"organization"){
+ 
+ return(req:CustomRequest,res:Response,next:NextFunction):void=>{
   const jwtInstance= new Jwt();
-
   try {
     const token= req.headers.authorization?.split(" ")[1];
-
     if(!token){
     res.status(401);
      throw new Error("no token provided")
@@ -37,6 +37,11 @@ import { Jwt } from "../utils/jwtUtils";
       res.status(401);
       throw new Error("invalid or expired token");
     }
+    if (role && role !== user.role) {
+      res.status(403).json({ message: "Unauthorized" });
+      throw new Error("unathourized")
+    }
+
   req.user=user;
    next()
 
@@ -46,3 +51,4 @@ import { Jwt } from "../utils/jwtUtils";
  
  }
  }
+}

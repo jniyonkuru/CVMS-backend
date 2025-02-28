@@ -15,5 +15,5 @@ import mongoose from 'mongoose';
 }).strict();
 
 export const UpdateApplicationValidationSchema=z.object({
-  status: z.enum(['pending', 'approved', 'rejected']).default('pending')
+  status: z.enum(['pending', 'approved', 'rejected'])
 }).strict();

@@ -4,11 +4,36 @@ import ApplicationServices from "../services/applicationServices";
 import { IApplication } from "../models/application";
 import { CustomRequest } from "../middlewares/Middlewares";
 import {omit, isEmpty}from "lodash"
+import { ApplicationValidationSchema, UpdateApplicationValidationSchema } from "../utils/applicationValidation";
+import { z, ZodObject, ZodTypeAny } from "zod";
+
+
+const handleValidationError=(data:Record<string,any>,validationSchema: ZodObject<Record<string, ZodTypeAny>>)=>{
+try {
+  validationSchema.safeParse(data);
+  return {
+    success:true,
+    errors:null
+  }
+} catch (error) {
+   if(error instanceof z.ZodError){
+    return {
+      success:false,
+      errors:error.format()
+    }
+   }
+   throw error
+}
+
+};
 
 
 export class ApplicationController {
 
   static async createApplication(req:CustomRequest,res:Response,next:NextFunction):Promise<void>{
+
+
+
     const  repository= new ApplicationRepository();
     const service= new ApplicationServices( repository);
      try {
@@ -23,6 +48,14 @@ export class ApplicationController {
      throw new Error("Unauthorized");
       }
       const applicationData={...req.body,volunteerId:user._id};
+      const applExists= await service.findApplications({applicationData});
+
+  if(applExists){
+    res.status(400);
+    throw new Error('You have already applied for this opportunity')
+  }
+      handleValidationError(applicationData,ApplicationValidationSchema);
+    
        const application=  await service.createOpportunity(applicationData);
 
        if(!application){
@@ -58,12 +91,11 @@ static async updateApplication(req:CustomRequest, res:Response,next:NextFunction
        throw new Error("Unauthenticated")
   }
  
- const applications= await service.findApplications({volunteerId:user._id,_id:id});
-
+ const applications= await service.findApplications({_id:id});
 
  if(applications.length===0){
     res.status(400)
-    throw new Error("application with given id for this organization was not found");
+    throw new Error("application with given id to opportunity that belong to this organization was not found");
  }
  const populatedApplications:Record<string,any>[] = await Promise.all(
     applications.map(async (application) => {
@@ -77,8 +109,14 @@ static async updateApplication(req:CustomRequest, res:Response,next:NextFunction
     res.status(403).json({ message: "Unauthorized" });
     return;
   }
+   handleValidationError(req.body,UpdateApplicationValidationSchema)
 
-
+   const immutableFields = ["opportunityId", "volunteerId", "applicationDate"];
+   for (const field of immutableFields) {
+     if (req.body[field as keyof IApplication]) {
+       throw new Error(`Field '${field}' cannot be updated.`);
+     }
+   }
    const updateApplication:IApplication| null= await service.updateApplication(req.body,id);
    if(!updateApplication){
      throw new Error('Failed to update the application');
@@ -116,6 +154,11 @@ static async updateApplication(req:CustomRequest, res:Response,next:NextFunction
        throw new Error("Application with given id for this organization was not found");
     }
 
+    const{volunteerId}:IApplication=applications[0]
+ if(volunteerId!==user._id){
+  res.status(403);
+  throw new Error("Unauthorized")
+ }
      await service.deleteApplication(id);
      res.status(203).json({
        status:'success',

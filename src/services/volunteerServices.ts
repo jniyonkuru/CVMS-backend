@@ -43,10 +43,10 @@ async updateVolunteer(updatedData:Partial<IVolunteer>,id:string):Promise<IVolunt
       if(! volunteer){
          throw new Error("User with the given id was not found");
       }
-      const {email}=updatedData;
+      const {email,password}=updatedData;
 
-      if(email){
-         throw new Error("Email can not be updated");
+      if(email||password){
+         throw new Error("Email and password can not be updated");
       }
     const validationResult= this.updateValitor.safeParse(updatedData);
     if(!validationResult.success){

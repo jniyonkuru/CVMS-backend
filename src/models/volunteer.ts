@@ -32,8 +32,8 @@ location:ILocation,
 profilePicture?:string,
 dateJoined:Date,
 status?:StatusType,
+role?:string
 }
-
 
   export const LocationSchema =new Schema<ILocation>({
     city:{
@@ -101,6 +101,10 @@ const VolunteerSchema = new Schema<IVolunteer>({
         type: String,
          enum: ["active", "inactive"],
           default: "active",
+        },
+        role:{
+            type:String,
+            default:"volunteer"
         }
 },{timestamps:true})
  
