@@ -20,13 +20,22 @@ import { VolunteerRepository } from "../repositories/volunteerRepository";
     const Vservice= new VolunteerServices(VRepository);
 
      try {
+      const {id}=req.params
+      if(!id){
+        res.status(400);
+        throw new Error("Volunteer id is required")
+      }
       const emptyBody=isEmpty(req.body);
       if(emptyBody){
         res.status(400);
         throw new Error('request body can not be empty')
       } 
-      const user= req?.user;
-      const feeback:IFeedback=user ?{...req.body,organizationId:user._id}:{...req.body}
+      const user= req.user;
+      if(!user){
+        res.status(401);
+        throw new Error("not Authenticated")
+      }
+      const feeback:IFeedback=user ?{...req.body,organizationId:user._id,volunteerId:id}:{...req.body}
     
       const validationResult=feedbackValidationSchema.safeParse(feeback);
       if(!validationResult.success){
@@ -37,7 +46,7 @@ import { VolunteerRepository } from "../repositories/volunteerRepository";
       throw new Error(`Validation failed: ${errorMessage}`);
       }  
 
-        let volunteerExists= await Vservice.findVolunteer(feeback.volunteerId.toString());
+        let volunteerExists= await Vservice.findVolunteer(id);
         if(!volunteerExists){
           res.status(400);
           throw new Error("User with the given id does not exists")

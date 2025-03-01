@@ -4,7 +4,9 @@ import mongoose,{Types,Schema,Document} from "mongoose";
  volunteerId:Types.ObjectId,
  organizationId:Types.ObjectId,
  comments:string,
- rating:number,
+ delivery:number,
+ friendlyness:number,
+ responsiveness:number,
  dateSubmitted:Date,
      
 }
@@ -21,12 +23,24 @@ const feedbackSchema= new Schema<IFeedback>({
     ref:'Organization',
     required:true,
  },
- rating:{
+ responsiveness:{
     type:Number,
     required:true,
     min:1,
     max:5
  },
+ delivery:{
+   type:Number,
+   required:true,
+   min:1,
+   max:5
+},
+friendlyness:{
+   type:Number,
+   required:true,
+   min:1,
+   max:5
+},
  dateSubmitted: {
     type: Date,
     default: Date.now,
@@ -39,5 +53,5 @@ const feedbackSchema= new Schema<IFeedback>({
 
 })
 
- export const Feedback= mongoose.model<IFeedback>("VolunteerToOrgFeedback",feedbackSchema);
+ export const Feedback= mongoose.model<IFeedback>("Feedback",feedbackSchema);
 
