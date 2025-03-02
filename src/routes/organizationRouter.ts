@@ -3,7 +3,6 @@ import { Router} from "express";
 import {OrganizationController } from "../controllers/organizationController";
 import { Middleware } from "../middlewares/Middlewares";
 const router= Router();
-router.post('/login',OrganizationController.loginOrganization);
 router.post('/create',OrganizationController.createOrganization);
 router.get('/:id',OrganizationController.findOrganizationById);
 router.get('/',OrganizationController.findOrganizations);

@@ -4,7 +4,6 @@ import { VolunteerController } from "../controllers/volunteerController";
 import { Middleware } from "../middlewares/Middlewares";
 
 const router= Router();
-router.post('/login',VolunteerController.loginVolunteer)
 router.post('/create',VolunteerController.createVolunteer);
 router.get('/:id',VolunteerController.findVolunteerById);
 router.get('/',VolunteerController.findVolunteers);

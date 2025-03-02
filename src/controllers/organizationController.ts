@@ -11,54 +11,6 @@ import { CustomRequest } from "../middlewares/Middlewares";
 import OrganizationValidationSchema,{OrganizationUpdateValidationSchema} from "../utils/organizationValidation";
 
   export class OrganizationController {
-
-    static async loginOrganization(req:Request,res:Response,next:NextFunction):Promise<void>{
-      const  repository= new OrganizationRepository();
-      const service= new OrganizationServices( repository);
-      const bcryptInstance= new Bcrypt();
-      const jwtInstance=new Jwt();
-
-      try {
-        const emptyRequest=isEmpty(req.body);
-        if(emptyRequest){
-          res.status(400);
-          throw new Error("Credentials are required");
-        }
-        const {email,password}=req.body;
-
-        if(!email || !password){
-         res.status(400);
-         throw new Error("Invalid credentials")
-        }
-    const [organization] = await service.findAllOrganization({email});
-    if(!organization){
-      res.status(400);
-      throw new Error("organization not found");
-    }
-  const passwordMatch= await bcryptInstance.verifyPassword(password,organization.password);
-    if(!passwordMatch){
-      res.status(400)
-      throw new Error("Invalid credentials");
-    }
-const payload= pick(organization,['_id','email','role']);
-const token =jwtInstance.generateToken(payload);
-if(!token){
-  throw new Error("Internal Error")
-}
- res.status(200).json({
-  status:"success",
-  message:'organization logged in successfully',
-  data:{
-    token,
-  }
- })
-    
-      } catch (error) {
-        next(error)
-      }
-
-
-    }
   static async createOrganization(req:Request,res:Response,next:NextFunction):Promise<void>{
     const  repository= new OrganizationRepository();
     const service= new OrganizationServices( repository);
