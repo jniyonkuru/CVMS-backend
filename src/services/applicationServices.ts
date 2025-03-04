@@ -11,7 +11,7 @@ class ApplicationServices {
     this.repository = repository;
   }
 
-  async createOpportunity(applicationData: IApplication): Promise<IApplication> {
+  async createApplication(applicationData: IApplication): Promise<IApplication> {
 
     return  await this.repository.create(applicationData);
   

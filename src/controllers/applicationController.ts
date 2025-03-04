@@ -50,13 +50,13 @@ export class ApplicationController {
       const applicationData={...req.body,volunteerId:user._id};
       const applExists= await service.findApplications({applicationData});
 
-  if(applExists){
+  if(applExists.length>0){
     res.status(400);
     throw new Error('You have already applied for this opportunity')
   }
       handleValidationError(applicationData,ApplicationValidationSchema);
     
-       const application=  await service.createOpportunity(applicationData);
+       const application=  await service.createApplication(applicationData);
 
        if(!application){
          throw new Error('Application has failed')
@@ -179,8 +179,9 @@ static async updateApplication(req:CustomRequest, res:Response,next:NextFunction
     res.status(400);
     throw new Error("Application Id is required");
     }
-    const application= await service.findApplication(id);
-    const leanApplication=omit(application,['__v'])
+    let application= await service.findApplication(id);
+   let populatedApplication= await application?.populate(["volunteerId","opportunityId"])
+    const leanApplication=omit(populatedApplication,['__v'])
     res.status(203).json({
       status:'success',
       data:leanApplication
@@ -196,7 +197,14 @@ static async updateApplication(req:CustomRequest, res:Response,next:NextFunction
    try {
       const query=req.query
       const applications= await service.findApplications(query);
-      const leanApplications= applications.map(v=>omit(v,['__v']));
+      const populatedApplications= await  Promise.all(
+        applications.map(async(application)=>{
+          return application.populate(["volunteerId","opportunityId"])
+        })
+      )
+
+
+      const leanApplications= populatedApplications.map(v=>omit(v,['__v']));
      res.status(200).json({
       status:"success",
       data:leanApplications
