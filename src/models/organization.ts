@@ -64,6 +64,10 @@ const OrganizationSchema = new Schema<IOrganization>({
             type:String,
             required:true
         },
+        websiteUrl:{
+         type:String,
+         unique:true
+        },
         role:{
             type:String,
             default:"organization"
