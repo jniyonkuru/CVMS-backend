@@ -5,7 +5,7 @@ dotenv.config()
 
 const  connectDB= async():Promise<void>=>{
     try {
-        mongoose.set('strictQuery', true);
+        mongoose.set('strictQuery', false);
         const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/volunteer-system';
         await mongoose.connect(MONGO_URI);
 

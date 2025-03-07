@@ -32,8 +32,6 @@ export class ApplicationController {
 
   static async createApplication(req:CustomRequest,res:Response,next:NextFunction):Promise<void>{
 
-
-
     const  repository= new ApplicationRepository();
     const service= new ApplicationServices( repository);
      try {
@@ -48,8 +46,8 @@ export class ApplicationController {
      throw new Error("Unauthorized");
       }
       const applicationData={...req.body,volunteerId:user._id};
-      const applExists= await service.findApplications({applicationData});
-
+      const applExists= await service.findApplications({...applicationData});
+      
   if(applExists.length>0){
     res.status(400);
     throw new Error('You have already applied for this opportunity')
