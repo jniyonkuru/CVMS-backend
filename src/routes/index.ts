@@ -15,6 +15,6 @@ router.use('/volunteers',volunteerRouter)
 router.use('/organizations',organizationRouter)
 router.use('/opportunities',opportunityRouter)
 router.use('/applications',applicationsRouter)
-router.use('/feebacks',feebackRouter)
+router.use('/feedbacks',feebackRouter)
 
 export  default router;

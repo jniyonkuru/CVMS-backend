@@ -83,27 +83,33 @@ static async updateOpportunity(req:CustomRequest, res:Response,next:NextFunction
   }
  const opportunities= await service.findAllOpportunities({organizationId:user._id,_id:id});
 
+
  if(opportunities.length===0){
     res.status(400)
     throw new Error("Opportunity with given id for this organization was not found");
  }
-
- const validationResult= UpdateOpportunityValidationSchema.safeParse({...req.body,startDate:new Date(req.body.startDate),endDate:new Date(req.body.endDate)});
+ const validationResult = UpdateOpportunityValidationSchema.safeParse({
+  ...req.body,
+  ...(req.body.startDate && { startDate: new Date(req.body.startDate) }),
+  ...(req.body.endDate && { endDate: new Date(req.body.endDate) }),
+});
+console.log(validationResult.success)
  if(!validationResult.success){
      const errorMessage = validationResult.error.errors
      .map((err) => `${err.path.join(".")}: ${err.message}`)
      .join(", ");
+     console.log(errorMessage)
    throw new Error(`Validation failed: ${errorMessage}`);
  }
-
-
-   const updateOpportunity:IOpportunity| null= await service.updateOpportunity(req.body,id);
+   const updateOpportunity:IOpportunity| null= await service.updateOpportunity({...req.body},id);
    if(!updateOpportunity){
+    console.log("opportunities")
      throw new Error('Failed to update the user');
    }
+   
   res.status(201).json({
     status:"success",
-    message:"The Opportunity was successfully  updated",
+    message:"The Event was successfully  updated",
     data:omit(updateOpportunity,['__v'])
   })
      } catch (error) {

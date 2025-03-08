@@ -54,6 +54,7 @@ import { VolunteerRepository } from "../repositories/volunteerRepository";
        let doc:IFeedback|null =  await Fservice.createFeeback(feeback);
 
        if(!doc){
+        res.status(500)
          throw new Error('Failed to create  a feeback')
 
        }
@@ -183,7 +184,11 @@ const updatedFeedback=await service.updateFeeback(req.body,id);
    try {
       const query=req.query
       const feebackData= await service.findAllFeeback(query);
-      const leanData= feebackData.map(v=>omit(v,['__v','password']));
+
+      const populatedFeedbackData= await Promise.all(
+          feebackData.map(async(feedback)=>await feedback.populate(['organizationId']))
+      )
+      const leanData= populatedFeedbackData.map(v=>omit(v,['__v','password']));
      res.status(200).json({
       status:"success",
       data:leanData

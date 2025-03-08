@@ -6,7 +6,7 @@ import { CustomRequest } from "../middlewares/Middlewares";
 import {omit, isEmpty}from "lodash"
 import { ApplicationValidationSchema, UpdateApplicationValidationSchema } from "../utils/applicationValidation";
 import { z, ZodObject, ZodTypeAny } from "zod";
-
+import { IOpportunity } from "../models/opportunity";
 
 const handleValidationError=(data:Record<string,any>,validationSchema: ZodObject<Record<string, ZodTypeAny>>)=>{
 try {
@@ -212,5 +212,43 @@ static async updateApplication(req:CustomRequest, res:Response,next:NextFunction
    }
 
  }
+
+ static async findApplicationsByOrganization(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+  const repository = new ApplicationRepository();
+  const service = new ApplicationServices(repository);
+
+  try {
+    const query = req.query;
+    const user = req.user;
+
+    if (!user) {
+      return next(new Error("Unauthenticated"));
+    }
+
+    const applications = await service.findApplications(query);
+    
+    const populatedApplications = await Promise.all(
+      applications.map(async (application) => await application.populate(["volunteerId", "opportunityId"]))
+    );
+
+    const filteredApplications: any[] = populatedApplications.filter(
+      (app) => (app.opportunityId as unknown as IOpportunity)?.organizationId?.toString() === user._id
+    );
+
+   
+    const leanApplications = filteredApplications.map((v) =>
+      omit(v.toObject(), ["__v", "organizationId.password", "volunteerId.password"])
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: leanApplications,
+    });
+
+  } catch (error) {
+    next(error);
+  }
+}
+
  
 }

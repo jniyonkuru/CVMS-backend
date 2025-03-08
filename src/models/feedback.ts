@@ -5,7 +5,7 @@ import mongoose,{Types,Schema,Document} from "mongoose";
  organizationId:Types.ObjectId,
  comments:string,
  delivery:number,
- friendlyness:number,
+ friendliness:number,
  responsiveness:number,
  dateSubmitted:Date,
      
@@ -35,7 +35,7 @@ const feedbackSchema= new Schema<IFeedback>({
    min:1,
    max:5
 },
-friendlyness:{
+friendliness:{
    type:Number,
    required:true,
    min:1,
