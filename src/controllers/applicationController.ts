@@ -3,10 +3,13 @@ import { ApplicationRepository } from "../repositories/applicationRepository";
 import ApplicationServices from "../services/applicationServices";
 import { IApplication } from "../models/application";
 import { CustomRequest } from "../middlewares/Middlewares";
-import {omit, isEmpty}from "lodash"
+import {omit, isEmpty, template}from "lodash"
 import { ApplicationValidationSchema, UpdateApplicationValidationSchema } from "../utils/applicationValidation";
 import { z, ZodObject, ZodTypeAny } from "zod";
 import { IOpportunity } from "../models/opportunity";
+import {sendEmailToVolunteer,sendEmailToOrganization} from "../utils/emailUtils";
+import { stat } from "fs";
+import { IOrganization } from "../models/organization";
 
 const handleValidationError=(data:Record<string,any>,validationSchema: ZodObject<Record<string, ZodTypeAny>>)=>{
 try {
@@ -54,12 +57,19 @@ export class ApplicationController {
   }
       handleValidationError(applicationData,ApplicationValidationSchema);
     
-       const application=  await service.createApplication(applicationData);
-
+       const application= await ( await service.createApplication(applicationData)).populate({
+        path:'opportunityId',
+        populate:{
+          path:'organizationId',
+        }
+       });
        if(!application){
          throw new Error('Application has failed')
 
        }
+       const organization=(application.opportunityId as unknown as IOpportunity).organizationId;
+       const event=(application.opportunityId as unknown as IOpportunity).title;
+      const result= await sendEmailToOrganization(organization,{template:"emailOrganization",subject:"New Application",event:event});
       const  leanApplication =omit(application, ['__v']);
        res.status(201).json({
         status:'success',
@@ -119,6 +129,11 @@ static async updateApplication(req:CustomRequest, res:Response,next:NextFunction
    if(!updateApplication){
      throw new Error('Failed to update the application');
    }
+   const {status}=updateApplication;
+   const {volunteerId:volunteer,opportunityId:event}=populatedApplications[0] as any;
+   
+
+   status==='approved'? await sendEmailToVolunteer(volunteer,{template:'approvalEmail',subject:'Congratulations',event:event.title}):status==='rejected'?await sendEmailToVolunteer(volunteer,{template:"rejectEmail",subject:"Application status",event:event.title}):null,
   res.status(201).json({
     status:"success",
     message:"Application was successfully  updated",

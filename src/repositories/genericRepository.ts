@@ -20,8 +20,7 @@ interface IGenericRepository<T extends Document>{
     }
     async create(data: Partial<T>):Promise<T>{
       const document =  this.model.create({...data});
-      const leanObject =(await document).toObject()
-      return leanObject as T
+      return document;
     }
 
     async findAll(): Promise<T[]> {
